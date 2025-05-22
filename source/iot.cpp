@@ -2,8 +2,13 @@
 #include "iot.h"
 #include "radio.h"
 #include "microbit_global.h"
+#include "bme280.h" 
+#include "veml6070.h"
+#include "tsl256x.h"
+#include "ssd1306.h"
 
 static ManagedString DISPLAY_SETTING = "TLH";
+MicroBitI2C i2c(I2C_SDA0,I2C_SCL0);
 
 void onIotData(MicroBitEvent)
 {
@@ -21,21 +26,47 @@ void onIotData(MicroBitEvent)
 void iot() {
     // Initialise the micro:bit runtime.
     initRadio(onIotData, false);
-    while(1)
-    {
-    if (uBit.buttonA.isPressed()) {
-        uBit.display.print("A");
-        sendDataSensor("18", "19", "20");
-    }
-    else if (uBit.buttonB.isPressed()) {
-        uBit.display.print("B");
-        sendDataSensor("12", "14", "15");
-    }
-    //displaySensor();
+    // Initialise the micro:bit runtime.
+    uBit.init();
+    uBit.serial.baud(115200); // Configure la vitesse de la sortie série
 
-    uBit.sleep(100);
-    uBit.display.clear();
+    bme280 bme(&uBit,&i2c);
+    uint32_t pressure = 0;
+    int32_t temp = 0;
+    uint16_t humidite = 0;
+
+    veml6070 veml(&uBit,&i2c);
+    uint16_t uv = 0;
+
+    tsl256x tsl(&uBit,&i2c);
+    uint16_t comb =0;
+    uint16_t ir = 0;
+    uint32_t lux = 0;
+
+    while(true)
+    {
+        bme.sensor_read(&pressure, &temp, &humidite);
+        int tmp = bme.compensate_temperature(temp);
+        int pres = bme.compensate_pressure(pressure)/100;
+        int hum = bme.compensate_humidity(humidite);
+
+        veml.sensor_read(&uv);
+
+        tsl.sensor_read(&comb, &ir, &lux);
+
+        // Affichage des valeurs
+        ManagedString msg = ManagedString("{id: ") + ManagedString(1) + 
+        ManagedString(", temperature: ") + ManagedString(tmp/100) + "." + (tmp > 0 ? ManagedString(tmp%100): ManagedString((-tmp)%100)) + 
+        ManagedString(", humidity: ") +  ManagedString(hum/100) + "." + ManagedString(tmp%100) +
+        ManagedString(", pressure: ") + ManagedString(pres)+
+        ManagedString(", UV: ") + ManagedString(uv) + 
+        ManagedString(", lux: ") + ManagedString((int)lux) + 
+        ManagedString("}\r\n");
+
+       uBit.serial.send(msg);
     }
+
+    release_fiber();
 }
 
 void displaySensor() {
