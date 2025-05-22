@@ -70,6 +70,22 @@
    //       }
    // }
 
+   void configVerifier() {
+      #if MICROBIT_BLUETOOTH_ENABLED != 0
+         while (true) {
+            uBit.display.scroll("BLUETOOTH ERROR");
+            uBit.sleep(1000);
+         }
+      #endif
+
+      #if MICROBIT_RADIO_MAX_PACKET_SIZE != 35
+         while (true) {
+            uBit.display.scroll("PACKET SIZE ERROR");
+            uBit.sleep(1000);
+         }
+      #endif
+   }
+
    int choose() {
       if (uBit.buttonA.isPressed()) {
          uBit.display.print("M");
@@ -85,6 +101,7 @@
    int main()
    {
       // Initialise the micro:bit runtime.
+      configVerifier();
       int CARDNUMBER = 0;
       uBit.init();
       uBit.display.scroll("SETUP");
