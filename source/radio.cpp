@@ -18,6 +18,7 @@ ManagedString initRadio(void (*onData)(MicroBitEvent), bool isMaster) {
             CARD_ID = "I1";
         }
     }
+    uBit.radio.setGroup(142);
     uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
     uBit.radio.enable();
     uBit.display.scroll(CARD_ID);

@@ -30,44 +30,21 @@
    #include "master.h"
    #include "microbit_global.h"
 
-   // TO WORK YOU HAVE TO CHANGE VALUE IN yotta_modules/microbit-dal/inc/core/MicroBitConfig.h
+   // TO WORK YOU HAVE TO CHANGE VALUE IN 
+
+   // yotta_modules/microbit-dal/inc/core/MicroBitConfig.h
    // #define MICROBIT_HEAP_ENABLED 0
 
-   // void onData(MicroBitEvent)
-   // {
-   //    ManagedString s = uBit.radio.datagram.recv();
+   // yotta_modules/microbit-dal/inc/drivers/MicroBitRadio.
+   // #define MICROBIT_RADIO_MAX_PACKET_SIZE=64
 
-   //    if (s == "1") {
-   //       ManagedString str = "A";
-   //       uBit.display.print("A");
-   //       uBit.serial.send(str);
-   //       uBit.serial.sendChar('\n');
-   //    }
-
-   //    if (s == "2") {
-   //       ManagedString str = "B";
-   //       uBit.display.print("B");
-   //       uBit.serial.send(str);
-   //       uBit.serial.sendChar('\n');
-   //    }
-   // }
-
-   // void receiver() {
-   //    uBit.serial.baud(115200);
-   //       ManagedString str = "Init";
-   //       uBit.serial.send(str);
-   //       uBit.serial.sendChar('\n');
-   //       //uBit.thermometer.setCalibration(uBit.thermometer.getTemperature());
-
-   //       uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
-   //       uBit.radio.enable();
-         
-   //       while (1) {
-   //          //uBit.display.scroll(uBit.thermometer.getTemperature());
-   //          //ManagedString msg = ManagedString("T: ") + ManagedString(uBit.thermometer.getTemperature()) + ManagedString("°C\r\n");
-   //          //uBit.serial.send(msg);
-   //          uBit.sleep(1000);
+   // YOU MUST HAVE THE FOLLOWING CONFIG.json IN THE ROOT FOLDER
+   // {    
+   //    "microbit-dal":{
+   //       "bluetooth":{
+   //             "enabled": 0
    //       }
+   //    }
    // }
 
    void configVerifier() {
@@ -81,6 +58,13 @@
       #if MICROBIT_RADIO_MAX_PACKET_SIZE != 35
          while (true) {
             uBit.display.scroll("PACKET SIZE ERROR");
+            uBit.sleep(1000);
+         }
+      #endif
+
+      #if MICROBIT_HEAP_ENABLED != 1
+         while (true) {
+            uBit.display.scroll("HEAP ERROR");
             uBit.sleep(1000);
          }
       #endif

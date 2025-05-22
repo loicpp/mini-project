@@ -6,11 +6,6 @@
   "dependencies": {
     "microbit": "https://git.mob-dev.fr/Schoumi/microbit.git"
   },
-  "build": {
-    "cxxFlags": [
-      "-DMICROBIT_RADIO_MAX_PACKET_SIZE=64"
-    ]
-  },
   "targetDependencies": {},
   "bin": "./source"
 }
