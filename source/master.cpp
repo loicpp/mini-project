@@ -3,7 +3,7 @@
 #include "radio.h"
 #include "microbit_global.h"
 
-void onData(MicroBitEvent)
+void onMasterData(MicroBitEvent)
 {
     ManagedString s = uBit.radio.datagram.recv();
     uBit.serial.send(s);
@@ -11,13 +11,14 @@ void onData(MicroBitEvent)
 }
 
 void master() {
+    initRadio(onMasterData, true);
+
     uBit.serial.baud(115200);
     ManagedString str = "Init";
     uBit.serial.send(str);
     uBit.serial.sendChar('\n');
     //uBit.thermometer.setCalibration(uBit.thermometer.getTemperature());
 
-    initRadio(onData, true);
     
     while (1) {
         //uBit.display.scroll(uBit.thermometer.getTemperature());

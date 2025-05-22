@@ -7,7 +7,7 @@ if [ "$#" -ne 1 ]; then
 fi
 
 # Chemin du fichier source
-source="./build/bbc-microbit-classic-gcc/source/microbit-samples-conbined.hex"
+source="./build/bbc-microbit-classic-gcc/source/microbit-samples-combined.hex"
 
 # Chemin du dossier de destination passé en argument
 destination="$1"

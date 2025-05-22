@@ -20,7 +20,7 @@ ManagedString initRadio(void (*onData)(MicroBitEvent), bool isMaster) {
     }
     uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
     uBit.radio.enable();
-
+    uBit.display.scroll(CARD_ID);
     return CARD_ID;
 }
 
@@ -38,7 +38,7 @@ void sendData(ManagedString receiver, ManagedString message) {
     }
 }
 
-sendDataSensor(ManagedString temperature, ManagedString luminosity, ManagedString humidity) {
+void sendDataSensor(ManagedString temperature, ManagedString luminosity, ManagedString humidity) {
     ManagedString display = temperature + "-" + luminosity + "-" + humidity;
     sendData(MASTER_ID, display);
 }

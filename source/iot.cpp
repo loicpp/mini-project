@@ -3,25 +3,33 @@
 #include "radio.h"
 #include "microbit_global.h"
 
+static ManagedString DISPLAY_SETTING = "TLH";
+
 void onIotData(MicroBitEvent)
 {
     ManagedString s = uBit.radio.datagram.recv();
-    uBit.display.scroll(s);
+
+    ManagedString output[MAX_SIZE];
+    splitManagedString(s, output);
+    bool isMaster = output[0].charAt(0) == 'M';
+
+    if (isMaster) {
+        DISPLAY_SETTING = output[1];
+    }
 }
 
 void iot() {
     // Initialise the micro:bit runtime.
     initRadio(onIotData, false);
-
     while(1)
     {
     if (uBit.buttonA.isPressed()) {
-            uBit.display.print("A");
-            sendData("1");
+        uBit.display.print("A");
+        sendDataSensor("18", "19", "20");
     }
     else if (uBit.buttonB.isPressed()) {
-            uBit.display.print("B");
-            sendData("2");
+        uBit.display.print("B");
+        sendDataSensor("12", "14", "15");
     }
     //displaySensor();
 
