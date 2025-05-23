@@ -38,8 +38,8 @@ ManagedString initRadio(void (*onData)(MicroBitEvent), bool isMaster) {
         }
     }
     // uBit.radio.setGroup(142);
-    // uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
-    // uBit.radio.enable();
+    uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
+    uBit.radio.enable();
     uBit.display.scroll(CARD_ID, SCROLL_SPEED);
     return CARD_ID;
 }

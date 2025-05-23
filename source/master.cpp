@@ -4,7 +4,7 @@
 #include "microbit_global.h"
 
 void sendSerial(ManagedString s) {
-    uBit.serial.send(s + "\n");
+    uBit.serial.send(s);
 }
 
 void onMasterData(MicroBitEvent) {
@@ -15,13 +15,13 @@ void onMasterData(MicroBitEvent) {
     if (isItForMe(message)) {
         ManagedString sender = getSender(message);
         sendSerial(message);
-        ManagedString response = uBit.serial.readUntil('\n');
-        if (response.length() > 0) {
+        ManagedString response = uBit.serial.readUntil('\n', ASYNC);
+        if (response.length() == 3) {
             sendRadio(sender, response);
+            uBit.display.scroll(response, SCROLL_SPEED);
+            uBit.sleep(100);
+            uBit.display.clear();
         }
-        uBit.display.print("S");
-        uBit.sleep(100);
-        uBit.display.clear();
     }
 }
 
@@ -39,8 +39,6 @@ void testFunctionMaster() {
 
 void master() {
     initRadio(onMasterData, true);
-    uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onMasterData);
-    uBit.radio.enable();
 
     uBit.serial.baud(115200);
     ManagedString str = "Init";

@@ -13,12 +13,18 @@ MicroBitI2C i2c(I2C_SDA0,I2C_SCL0);
 void onIotData(MicroBitEvent)
 {
     ManagedString s = uBit.radio.datagram.recv();
-
+    
     if (isCameFromMaster(s) && isItForMe(s)) {
         ManagedString message = getMessage(s);
         if (message.length() == 3) {
             DISPLAY_SETTING = message;
             uBit.display.scroll(DISPLAY_SETTING, SCROLL_SPEED);
+        }
+        else {
+            uBit.display.print("E");
+            uBit.sleep(100);
+            uBit.display.clear();
+            uBit.display.scroll(message, SCROLL_SPEED);
         }
     }
 }
@@ -57,8 +63,6 @@ void testFunctionIot() {
 void iot() {
     // Initialise the micro:bit runtime.
     initRadio(onIotData, false);
-    uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onIotData);
-    uBit.radio.enable();
 
     bme280 bme(&uBit,&i2c);
     uint32_t pressure = 0;
