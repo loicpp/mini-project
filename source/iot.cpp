@@ -7,28 +7,58 @@
 #include "tsl256x.h"
 #include "ssd1306.h"
 
-static ManagedString DISPLAY_SETTING = "TLH";
+static ManagedString DISPLAY_SETTING = "TLH"; // Ordre d'affichage sur l'écran OLED (par défaut: : Temperature, Luminosity, Humidity)
 MicroBitI2C i2c(I2C_SDA0,I2C_SCL0);
 
 void onIotData(MicroBitEvent)
 {
     ManagedString s = uBit.radio.datagram.recv();
 
-    ManagedString output[MAX_SIZE];
-    splitManagedString(s, output);
-    bool isMaster = output[0].charAt(0) == 'M';
+    if (isCameFromMaster(s) && isItForMe(s)) {
+        ManagedString message = getMessage(s);
+        if (message.length() == 3) {
+            DISPLAY_SETTING = message;
+            uBit.display.scroll(DISPLAY_SETTING, SCROLL_SPEED);
+        }
+    }
+}
 
-    if (isMaster) {
-        DISPLAY_SETTING = output[1];
+void displayOn(ManagedString temperature, ManagedString luminosity, ManagedString humidity) {
+    for (int i = 0; i < DISPLAY_SETTING.length(); i++) {
+        char c = DISPLAY_SETTING.charAt(i);
+        switch (c) {
+            case 'T':
+                temperature = temperature;
+                // display Temperature on OLED screen
+                break;
+            case 'L':
+                luminosity = luminosity;
+                // display Luminosity on OLED screen
+                break;
+            case 'H':
+                humidity = humidity;
+                // display Humidity on OLED screen
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+void testFunctionIot() {
+    if (uBit.buttonA.isPressed()) {
+        sendRadioData("26.73", "320", "44.73");
+    }
+    else if (uBit.buttonB.isPressed()) {
+        sendRadioData("27.92", "1197", "40.92");
     }
 }
 
 void iot() {
     // Initialise the micro:bit runtime.
     initRadio(onIotData, false);
-    // Initialise the micro:bit runtime.
-    uBit.init();
-    uBit.serial.baud(115200); // Configure la vitesse de la sortie série
+    uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onIotData);
+    uBit.radio.enable();
 
     bme280 bme(&uBit,&i2c);
     uint32_t pressure = 0;
@@ -63,10 +93,17 @@ void iot() {
         ManagedString(", lux: ") + ManagedString((int)lux) + 
         ManagedString("}\r\n");
 
-       uBit.serial.send(msg);
-    }
+        testFunctionIot(); // Test function to send data to the master
 
-    release_fiber();
+        // Affichage et envoi des données
+        ManagedString temperatureToDisplay = ManagedString(tmp/100) + "." + (tmp > 0 ? ManagedString(tmp%100): ManagedString((-tmp)%100));
+        ManagedString luminosityToDisplay = ManagedString((int)lux);
+        ManagedString humidityToDisplay = ManagedString(hum/100) + "." + ManagedString(tmp%100);
+
+        displayOn(temperatureToDisplay, luminosityToDisplay, humidityToDisplay); // Afficher les données sur l'écran OLED
+        sendRadioData(temperatureToDisplay, luminosityToDisplay, humidityToDisplay); // Envoyer les données à la microbit master
+        uBit.sleep(10000); // Attendre 1 minute avant de lire à nouveau
+    }
 }
 
 void displaySensor() {

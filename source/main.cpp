@@ -88,13 +88,13 @@
       configVerifier();
       int CARDNUMBER = 0;
       uBit.init();
-      uBit.display.scroll("SETUP");
+      uBit.display.scroll("SETUP", SCROLL_SPEED);
       while (CARDNUMBER == 0) {
          CARDNUMBER = choose();
          uBit.sleep(100);
       }
       uBit.display.clear();
-      uBit.display.scroll("INIT");
+      uBit.display.scroll("INIT", SCROLL_SPEED);
 
       // 1 == Receiver
       if (CARDNUMBER == 1) {
