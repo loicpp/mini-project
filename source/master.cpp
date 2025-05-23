@@ -8,10 +8,11 @@ void sendSerial(ManagedString s) {
 }
 
 void onMasterData(MicroBitEvent) {
-    ManagedString message = uBit.radio.datagram.recv();
+    ManagedString raw_message = uBit.radio.datagram.recv();
     uBit.display.print("R");
     uBit.sleep(100);
     uBit.display.clear();
+    ManagedString message = encryption(raw_message);
     if (isItForMe(message)) {
         ManagedString sender = getSender(message);
         sendSerial(message);

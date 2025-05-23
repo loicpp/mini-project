@@ -4,6 +4,7 @@
 
 static ManagedString CARD_ID = "";
 static ManagedString MASTER_ID = "M1";
+static ManagedString ENCRYPTION_KEY = "o5U4mwP34wGzSRV9Y";
 
 bool isCameFromMaster(ManagedString s) {
     ManagedString output[MAX_SIZE];
@@ -29,6 +30,20 @@ ManagedString getMessage(ManagedString s) {
     return output[2];
 }
 
+ManagedString encryption(ManagedString &input) {
+    ManagedString output = "";
+    uint8_t input_len = input.length();
+    uint8_t key_len = ENCRYPTION_KEY.length();
+
+    for (uint8_t i = 0; i < input_len; i++) {
+        char c = input.charAt(i);
+        char k = ENCRYPTION_KEY.charAt(i % key_len);
+        output = output + (char)(c ^ k);
+    }
+
+    return output;
+}
+
 ManagedString initRadio(void (*onData)(MicroBitEvent), bool isMaster) {
     if (CARD_ID == "") {
         if (isMaster) {
@@ -37,7 +52,7 @@ ManagedString initRadio(void (*onData)(MicroBitEvent), bool isMaster) {
             CARD_ID = "I1";
         }
     }
-    // uBit.radio.setGroup(142);
+    uBit.radio.setGroup(142);
     uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
     uBit.radio.enable();
     uBit.display.scroll(CARD_ID, SCROLL_SPEED);
@@ -54,13 +69,13 @@ void sendRadio(ManagedString receiver, ManagedString message) {
     }
     else {
         ManagedString display = ManagedString(CARD_ID) + "-" + receiver + "-" + message;
-        int status = uBit.radio.datagram.send(display + "\n");
+        ManagedString encrypted = encryption(display);
+        int status = uBit.radio.datagram.send(encrypted + "\n");
         if(status == MICROBIT_OK) {
             uBit.display.print("S");
         } else {
             uBit.display.print("E");
         }
-        //uBit.display.print("S");
         uBit.sleep(100);
         uBit.display.clear();
     }
