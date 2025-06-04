@@ -5,6 +5,7 @@
 
 void sendSerial(ManagedString s) {
     uBit.serial.send(s);
+    uBit.serial.send("\n");
 }
 
 void onMasterData(MicroBitEvent) {
