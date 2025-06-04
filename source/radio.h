@@ -9,6 +9,8 @@ bool isItForMe(ManagedString s);
 
 ManagedString getMessage(ManagedString s);
 
+ManagedString encryption(ManagedString &input);
+
 ManagedString initRadio(void (*onData)(MicroBitEvent), bool isMaster = false);
 
 void sendRadio(ManagedString receiver, ManagedString message);
