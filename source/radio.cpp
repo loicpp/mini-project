@@ -37,7 +37,7 @@ ManagedString initRadio(void (*onData)(MicroBitEvent), bool isMaster) {
             CARD_ID = "I1";
         }
     }
-    // uBit.radio.setGroup(142);
+    uBit.radio.setGroup(142);
     uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
     uBit.radio.enable();
     uBit.display.scroll(CARD_ID, SCROLL_SPEED);
@@ -46,15 +46,15 @@ ManagedString initRadio(void (*onData)(MicroBitEvent), bool isMaster) {
 
 void sendRadio(ManagedString receiver, ManagedString message) {
     if (CARD_ID == "") {
-        uBit.display.print("E");
+        uBit.display.print("C");
         ManagedString str = "Error: Card number not set, you have to call initRadio() before";
         uBit.radio.datagram.send(str);
         uBit.sleep(1000);
         uBit.display.clear();
     }
     else {
-        ManagedString display = ManagedString(CARD_ID) + "-" + receiver + "-" + message;
-        int status = uBit.radio.datagram.send(display + "\n");
+        ManagedString display = ManagedString(CARD_ID) + "-" + receiver + "-" + message + "\n";
+        int status = uBit.radio.datagram.send(display);
         if(status == MICROBIT_OK) {
             uBit.display.print("S");
         } else {
